@@ -20,36 +20,6 @@ blue_var = tk.IntVar()
 green_var = tk.IntVar()
 red_var = tk.IntVar()
 
-def empty(a):
-    pass
-
-# Tkinter GUI Elements
-cv_panel = tk.Canvas(root, width=640, height=480)
-cv_panel.pack()
-
-tk.Label(root, text="Blue").pack()
-blue_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=blue_var)
-blue_scale.pack()
-
-tk.Label(root, text="Green").pack()
-green_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=green_var)
-green_scale.pack()
-
-tk.Label(root, text="Red").pack()
-red_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=red_var)
-red_scale.pack()
-
-# Initialize color variables
-img_color_lips = np.zeros((1, 1, 3), np.uint8)
-img_color_lips[:] = 0, 0, 0
-
-# Tkinter Image Panel
-img_original = np.zeros((480, 640, 3), np.uint8)
-imgtk_original = ImageTk.PhotoImage(Image.fromarray(img_original))
-panel = tk.Label(cv_panel, image=imgtk_original)
-panel.imgtk = imgtk_original
-panel.pack()
-
 def createBox(img, points, scale=5, masked=False, cropped=True):
     if masked:
         mask = np.zeros_like(img)
@@ -65,9 +35,6 @@ def createBox(img, points, scale=5, masked=False, cropped=True):
     else:
         return mask
 
-# Move img_lips outside the loop
-img_lips = np.zeros((480, 640, 3), np.uint8)
-
 def update_color():
     b = blue_var.get()
     g = green_var.get()
@@ -81,11 +48,41 @@ def update_color():
     panel.imgtk = imgtk
     panel.config(image=imgtk)
 
-    root.after(10, update_color)  # Schedule the next update
+def empty(a):
+    pass
 
-root.after(10, update_color)  # Initial update
+# Tkinter GUI Elements
+cv_panel = tk.Canvas(root, width=640, height=480)
+cv_panel.pack()
 
-while True:
+tk.Label(root, text="Blue").pack()
+blue_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=blue_var, command=update_color)
+blue_scale.pack()
+
+tk.Label(root, text="Green").pack()
+green_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=green_var, command=update_color)
+green_scale.pack()
+
+tk.Label(root, text="Red").pack()
+red_scale = tk.Scale(root, from_=0, to=255, orient=tk.HORIZONTAL, variable=red_var, command=update_color)
+red_scale.pack()
+
+# Initialize color variables
+img_color_lips = np.zeros((1, 1, 3), np.uint8)
+img_color_lips[:] = 0, 0, 0
+
+# Tkinter Image Panel
+img_original = np.zeros((480, 640, 3), np.uint8)
+imgtk_original = ImageTk.PhotoImage(Image.fromarray(img_original))
+panel = tk.Label(cv_panel, image=imgtk_original)
+panel.imgtk = imgtk_original
+panel.pack()
+
+# Set img_lips to global variable for color update
+global img_lips
+img_lips = np.zeros((480, 640, 3), np.uint8)
+
+def update_tkinter():
     # Webcam
     if webcam:
         success, img = cap.read()
@@ -93,7 +90,8 @@ while True:
         img = cv2.imread('2.jpg')
 
     img = cv2.resize(img, (640, 480))
-    img_original = img.copy()
+    img_original[:] = img
+
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = detector(img_gray)
 
@@ -108,19 +106,18 @@ while True:
         my_points = np.array(my_points)
         img_lips = createBox(img, my_points[48:61], 8, masked=True, cropped=False)
 
-    # Set img_lips to global variable for color update
-    img_lips = cv2.cvtColor(img_lips, cv2.COLOR_BGR2RGB)
-
     # Update the Tkinter window
     root.update_idletasks()
+    update_color()
     root.update()
 
     if cv2.waitKey(1) & 0xFF == 27:  # Press 'Esc' to exit
-        break
+        cap.release()
+        cv2.destroyAllWindows()
+        root.destroy()
 
-# Release the video capture object and close OpenCV windows
-cap.release()
-cv2.destroyAllWindows()
+    root.after(10, update_tkinter)
 
-# Start the Tkinter main loop
+# Start the Tkinter main loop and update loop
 root.mainloop()
+root.after(10, update_tkinter)
