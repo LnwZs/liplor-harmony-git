@@ -3,6 +3,8 @@ import dlib
 import numpy as np
 from tkinter import *
 from PIL import Image,ImageTk
+from tkinter_webcam import webcam
+
 
 # Create tkinter window
 #root = Tk()
@@ -25,6 +27,7 @@ root = Tk()
 root.geometry('1500x900+400+100')
 root.title('Liplor Harmony')
 
+
 #load pic
 pic1=ImageTk.PhotoImage(file='pic1.png')
 pic2=ImageTk.PhotoImage(file='pic2.png')
@@ -35,9 +38,15 @@ pic6=ImageTk.PhotoImage(file='pic6.png')
 pic7=ImageTk.PhotoImage(file='pic7.png')
 pic8=ImageTk.PhotoImage(file='pic8.png')
 
-b = Scale(root,label='BLUE', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=10)
-g = Scale(root,label='GREEN', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=20)
-r = Scale(root,label='RED', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=30)
+#b = Scale(root,label='BLUE', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=10)
+#g = Scale(root,label='GREEN', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=20)
+#r = Scale(root,label='RED', from_=0, to=255,tickinterval=10, orient=HORIZONTAL).grid(column=5,row=30)
+
+
+b = Scale(root,label='BLUE', from_=0, to=255, orient=HORIZONTAL).grid(column=5,row=10)
+g = Scale(root,label='GREEN', from_=0, to=255, orient=HORIZONTAL).grid(column=5,row=20)
+r = Scale(root,label='RED', from_=0, to=255, orient=HORIZONTAL).grid(column=5,row=30)
+
 
 Button1 = Button(root, image=pic1, text="pic1").grid(column=6,row=40)
 Button2 = Button(root, image=pic2, text="pic2").grid(column=7,row=40)
