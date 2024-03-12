@@ -11,4 +11,4 @@ download this github
 
 *RUN*
 
-open code Liplor harmony and run
+open code Liplor Harmony.py and run
